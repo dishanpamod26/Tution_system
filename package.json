@@ -1,0 +1,8 @@
+{
+  "name": "educore-tuition",
+  "version": "1.0.0",
+  "description": "EduCore Tuition Management System",
+  "dependencies": {
+    "mongodb": "^6.3.0"
+  }
+}
