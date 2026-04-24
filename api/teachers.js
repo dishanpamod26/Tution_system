@@ -46,6 +46,11 @@ module.exports = async (req, res) => {
         return res.status(405).json({ error: 'Method not allowed' });
     } catch (e) {
         console.error('Teachers API Error:', e);
-        return res.status(500).json({ error: e.message });
+        // Return detailed error for debugging
+        return res.status(500).json({ 
+            error: e.message, 
+            stack: process.env.NODE_ENV === 'development' ? e.stack : undefined,
+            hint: "Check MONGODB_URI and IP Whitelist in Atlas"
+        });
     }
 };
