@@ -229,26 +229,41 @@ function closeTeacherModal() {
 
 async function saveTeacher(e) {
     e.preventDefault();
-    const editId = document.getElementById('teacher-edit-id').value;
-    const name = document.getElementById('t-name').value;
-    const nic = document.getElementById('t-nic').value;
-    const phone = document.getElementById('t-phone').value;
-    const category = document.getElementById('t-category').value;
-    const subjects = document.getElementById('t-subjects').value;
+    const btn = e.target.querySelector('button[type="submit"]');
+    const originalText = btn.innerText;
     
-    if (editId) {
-        const existing = await db.teachers.get(parseInt(editId)) || await db.teachers.get(editId);
-        const teacherId = existing ? existing.teacherId : `TCH-REPAIR`;
-        await db.teachers.put({ id: parseInt(editId) || editId, teacherId, name, nic, phone, category, subjects });
-    } else {
-        const teachers = await db.teachers.toArray();
-        const teacherId = `TCH-${1001 + teachers.length}`;
-        await db.teachers.add({ teacherId, name, nic, phone, category, subjects });
-    }
+    try {
+        btn.innerText = 'Saving...';
+        btn.disabled = true;
 
-    closeTeacherModal();
-    loadTeachers();
-    if(document.getElementById('nav-dashboard') && document.getElementById('nav-dashboard').classList.contains('active')) loadDashboard();
+        const editId = document.getElementById('teacher-edit-id').value;
+        const name = document.getElementById('t-name').value;
+        const nic = document.getElementById('t-nic').value;
+        const phone = document.getElementById('t-phone').value;
+        const category = document.getElementById('t-category').value;
+        const subjects = document.getElementById('t-subjects').value;
+        
+        if (editId) {
+            const existing = await db.teachers.get(parseInt(editId)) || await db.teachers.get(editId);
+            const teacherId = existing ? existing.teacherId : `TCH-REPAIR`;
+            await db.teachers.put({ _id: editId, teacherId, name, nic, phone, category, subjects });
+        } else {
+            const teachers = await db.teachers.toArray();
+            const teacherId = `TCH-${1001 + teachers.length}`;
+            await db.teachers.add({ teacherId, name, nic, phone, category, subjects });
+        }
+
+        showToast("Teacher Saved Successfully!");
+        closeTeacherModal();
+        loadTeachers();
+        if(document.getElementById('nav-dashboard') && document.getElementById('nav-dashboard').classList.contains('active')) loadDashboard();
+    } catch (err) {
+        console.error("❌ Save Teacher Failed:", err);
+        alert("Failed to save teacher: " + err.message);
+    } finally {
+        btn.innerText = originalText;
+        btn.disabled = false;
+    }
 }
 
 async function deleteTeacher(id) {
